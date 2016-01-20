@@ -67,6 +67,7 @@ int ImMessageDispatcher::process(ms::IMessage* msg)
             _app_workers->schedule(msg);
             break;
     }
+    return 0;
 }
 
 }
