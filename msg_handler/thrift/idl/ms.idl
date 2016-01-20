@@ -1,0 +1,29 @@
+namespace cpp ms
+namespace py ms
+namespace php ms
+
+enum ResponseCode
+{
+    UNKNOWN     = 0
+    OK          = 1 //everything is ok
+    ERROR       = 2 //everything is ok
+}
+
+struct MessageRequest
+{
+    1: optional i64 msh_id;
+    2: optional binary msg_id;
+    3: optional binary msg;
+}
+
+struct MessageResponse
+{
+    1: optional ResponseCode code;
+    2: optional binary msg;
+}
+
+service Message
+{
+    MessageResponse dispatch(1: MessageRequest request)
+}
+

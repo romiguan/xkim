@@ -1,0 +1,159 @@
+package im;
+
+/*
+ * 消息内容类型
+ */
+enum ImMsgType
+{
+    IM_TXT = 1;     // 文本
+    IM_PIC = 2;     // 图片
+    IM_VDO = 3;     // 视频
+}
+
+/*
+ * 消息逻辑类型
+ */
+enum ImMsgLogicType
+{
+    IM_REQUEST  = 1; // 向别人发起的消息
+    IM_RESPONSE = 2; // 向别人响应的消息
+}
+
+/*
+ * 消息包类型
+ */
+enum ImPackType
+{
+    IM_UNKNOW           = 0;    // unknown值，用于升级时防止增加enum值带来的版本短时不一致
+    IM_TOUCH            = 1;    // 心跳包
+    IM_TOUCH_ACK        = 2;    // 心跳包ack
+    IM_MSG              = 3;    // 消息包
+    IM_MSG_ACK          = 4;    // 消息包ack
+    IM_AUTH             = 5;    // 认证请求包
+    IM_AUTH_RESPONSE    = 6;    // 认证响应包
+}
+
+/*
+ * 长连接心跳结构
+ */
+message ImTouch
+{
+    required int32 uid = 1;
+}
+
+/*
+ * 长连接心跳响应结构
+ */
+message ImTouchResponse
+{
+    required int32 uid = 1;
+}
+
+/*
+ * 消息结构
+ * client和server之间的通信结构
+ */
+message ImMsg
+{
+    // 用户,两个含义
+    // 表示发消息的用户
+    required int32 uid              = 1;
+
+    // 序列号, 用于ack的匹配
+    required int32 seq              = 2;
+
+    // 用户集合
+    // 表示接消息的用户
+    repeated int32 target_uid       = 3;
+
+    // 消息逻辑类型
+    required ImMsgLogicType type    = 4;
+
+    // 如果是响应消息，表示针对哪个消息id的响应
+    // 如果是请求消息，表示请求消息的id
+    optional bytes msg_id           = 5;
+
+    // 消息悬赏额
+    optional float points           = 6;
+
+    // 消息过期时间绝对值
+    optional int32 timeout          = 7;
+
+    // 文本内容，图片id，视频id
+    // 文本图片视频可以一同出现，自由组合
+    // 消息文本内容,utf8编码
+    optional bytes text_content     = 8;
+    optional string pic_id          = 9;
+    optional string vid_id          = 10;
+
+    // 消息中的地址词, utf-8
+    optional bytes loc_word         = 11;
+}
+
+/*
+ * 消息请求ack结构
+ */
+message ImMsgAck
+{
+    // 把消息id返回
+    optional bytes msg_id = 1;
+
+    // 序列号
+    required int32 seq    = 2;
+}
+
+message ImAuthRequest
+{
+    // 本次请求的用户
+    required int32 uid        = 1;
+
+    // token
+    required string token     = 2;
+}
+
+message ImAuthResponse
+{
+    // token
+    required string token      = 1;
+
+    // 认证结果, true 成功； false 失败
+    required bool auth_success = 2;
+}
+
+/*
+ *消息响应内容结构,每个ImPackType对应一个
+ */
+message ImPackContent
+{
+    // 这是一个心跳包
+    optional ImTouch touch              = 1;
+
+    // 这是一个心跳包响应
+    optional ImTouchResponse touch_rep  = 2;
+
+    // 这是一个消息请求
+    optional ImMsg msg                  = 3;
+
+    // 这是一个消息请求ack
+    optional ImMsgAck msg_ack           = 4;
+
+    // Auth 请求
+    optional ImAuthRequest auth_req     = 5;
+
+    // Auth 响应
+    optional ImAuthResponse auth_rep    = 6;
+}
+
+/*
+ *消息包结构
+ */
+message ImPack
+{
+    // 包类型，根据这个类型，获取下面对应的信息
+    required ImPackType type        = 1;
+    required ImPackContent content  = 2;
+
+    // 时间戳,距离2015-01-01:00:00:00(1420041600)的秒数
+    optional int32 ts               = 3;
+}
+
