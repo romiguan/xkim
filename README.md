@@ -9,3 +9,7 @@ msg_handler and msg_server are loosely coupled. We use pilot, a thrift based com
 
 
 The message is defined in protobuf format.
+
+To contact us:
+   linucswf@163.com
+   @romi1 at sina weibo
